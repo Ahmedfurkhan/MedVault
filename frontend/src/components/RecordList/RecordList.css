@@ -1,0 +1,96 @@
+.record-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.record-list-header h3 {
+  margin: 0;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+.record-list-header button {
+  border: none;
+  background: var(--brand-grad);
+  color: var(--brand-contrast);
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.record-card {
+  background: var(--surface);
+  padding: 16px;
+  margin: 10px 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.record-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.record-card.active {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-md);
+}
+.record-card-select {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.record-card-title {
+  display: block;
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.record-card-type {
+  display: block;
+  margin: 0;
+  color: var(--text-muted);
+}
+.record-card-edit {
+  margin-top: 10px;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--brand-soft);
+  color: var(--brand-text);
+  font-weight: 600;
+}
+.empty-state {
+  background: var(--surface-2);
+  border: 1px dashed var(--brand);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.empty-state h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.empty-state button {
+  margin-top: 10px;
+  border: none;
+  background: var(--brand-grad);
+  color: var(--brand-contrast);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -1,0 +1,2 @@
+/* RegisterForm shares the auth-card styling defined for the login screen. */
+@import '../LoginForm/LoginForm.css';

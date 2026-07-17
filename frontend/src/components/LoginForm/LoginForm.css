@@ -1,0 +1,86 @@
+.auth-card {
+  background: var(--surface);
+  padding: clamp(22px, 4vw, 34px);
+  max-width: 430px;
+  width: 100%;
+  margin: 0 auto;
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+.auth-heading {
+  margin-bottom: 16px;
+}
+.auth-heading h3 {
+  margin: 6px 0 6px;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+.auth-subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.auth-card input {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-sizing: border-box;
+  background: var(--surface-2);
+  color: var(--text);
+}
+.auth-card input:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+.auth-card button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--brand-grad);
+  color: var(--brand-contrast);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+.secondary-link {
+  margin-top: 12px;
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+.auth-error {
+  color: var(--danger);
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+.auth-note {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.forgot-link {
+  align-self: flex-end;
+  background: none !important;
+  border: none;
+  box-shadow: none !important;
+  color: var(--brand-text) !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 !important;
+}
+.dev-reset {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
