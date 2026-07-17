@@ -2,8 +2,6 @@
 
 **Author:** Ahmed Furkhan
 
-**Class link:** _[add your course/section link here]_
-
 **Design document:** [MedVault_Design_Document.docx](./design/MedVault_Design_Document.docx)
 
 **Presentation:** [MedVault_Presentation.pptx](./design/MedVault_Presentation.pptx)
@@ -72,7 +70,7 @@ Install, seed the database, and start:
 ```bash
 cd backend
 npm install
-npm run seed   # creates test user maria@example.com / password123 + 1k+ synthetic records
+npm run seed   # creates test user maria@gmail.com / password123 + 1k+ synthetic records
 npm run dev
 ```
 
