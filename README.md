@@ -36,14 +36,14 @@ MedVault is a privacy-first, AI-assisted access auditor for patient medical reco
 
 ### Password reset (secure token link)
 
-| Forgot password | Set new password |
-| :-------------: | :--------------: |
+|                     Forgot password                     |                    Set new password                    |
+| :------------------------------------------------------: | :----------------------------------------------------: |
 | ![Forgot password](./screenshots/08-forgot-password.png) | ![Reset password](./screenshots/09-reset-password.png) |
 
 ### Dark mode & responsive
 
-| Dashboard (dark) | Mobile menu (dark) |
-| :--------------: | :----------------: |
+|                      Dashboard (dark)                      |                   Mobile menu (dark)                   |
+| :---------------------------------------------------------: | :----------------------------------------------------: |
 | ![Dashboard dark mode](./screenshots/06-dashboard-dark.png) | ![Mobile navigation](./screenshots/07-mobile-menu.png) |
 
 ## Tech Stack
@@ -108,14 +108,14 @@ docker run --env MONGO_URI=... --env SESSION_SECRET=... --env GROQ_API_KEY=... -
 
 ## Usage
 
-1. Register a new account, or log in with the seeded account `maria@example.com` / `password123`.
+1. Register a new account, or log in with the seeded account `maria@gmail.com` / `password123`.
 2. **My Records** — create, view, edit, and delete medical records. Selecting a record opens its access timeline.
 3. **Dashboard** — review your risk score, off-hours incidents, view-burst counts, the access-trend chart, and AI-explained security alerts.
 4. **Settings** — update your profile and off-hours window used by the anomaly rules.
 
 ## Notes
 
-- Default seeded credentials: `maria@example.com` / `password123`.
+- Default seeded credentials: `maria@gmail.com` / `password123`.
 - Secrets are read from environment variables and are never committed. `backend/.env` is git-ignored; only `backend/.env.example` (placeholders) is tracked.
 - The frontend optionally reads `VITE_API_BASE` for a custom production API origin; leave it unset to use the same origin.
 
