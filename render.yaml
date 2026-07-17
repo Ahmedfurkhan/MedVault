@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: medvault
+    runtime: node
+    plan: free
+    # Build the React frontend (needs dev deps like Vite even when NODE_ENV=production)
+    # and install backend runtime deps. Express serves the built frontend from backend.
+    buildCommand: npm install --prefix backend && npm install --include=dev --prefix frontend && npm run build --prefix frontend
+    startCommand: node backend/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false

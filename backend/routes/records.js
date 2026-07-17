@@ -5,7 +5,10 @@ import requireAuth from '../middleware/requireAuth.js';
 import logAccess from '../middleware/logAccess.js';
 
 const router = Router();
-router.use(requireAuth);
+// Scope auth to the record endpoints only. This router is mounted at '/', so an
+// unscoped router.use(requireAuth) would 401 every request - including the SPA's
+// static files and index.html in production.
+router.use('/api/records', requireAuth);
 
 router.get('/api/records', async (req, res) => {
   const page = Math.max(1, parseInt(req.query.page, 10) || 1);
