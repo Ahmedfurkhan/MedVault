@@ -76,7 +76,7 @@ async function seed() {
   await db.collection('records').insertMany(records);
   await db.collection('accessLogs').insertMany(logs);
   console.log(
-    `Seeded User (maria@example.com / password123), ${records.length} records and ${logs.length} logs.`
+    `Seeded User (maria@gmail.com / password123), ${records.length} records and ${logs.length} logs.`
   );
   process.exit(0);
 }
