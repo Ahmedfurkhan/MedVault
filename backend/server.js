@@ -38,6 +38,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
 app.use(authRoutes);
 app.use(recordRoutes);
 app.use(logRoutes);
@@ -47,8 +49,9 @@ app.use(assistantRoutes);
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../frontend/dist/index.html')));
 
+// Bind the port immediately so the app (and static SPA) is reachable, then connect
+// to MongoDB. A DB hiccup logs an error instead of taking the whole service offline.
+app.listen(port, () => console.log(`Server running on port ${port}`));
 connectDB()
-  .then(() => {
-    app.listen(port, () => console.log(`Server running on port ${port}`));
-  })
+  .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('DB connection failed:', err));
