@@ -6,7 +6,7 @@
 
 **Presentation:** [MedVault_Presentation.pptx](./design/MedVault_Presentation.pptx)
 
-**Deploy Link:** [https://medvault-jh8r.onrender.com/](*https://medvault-jh8r.onrender.com/*)
+**Deploy Link:** [https://medvault-jh8r.onrender.com/](https://medvault-jh8r.onrender.com/)
 
 ## Project Objective
 
