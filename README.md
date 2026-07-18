@@ -1,6 +1,8 @@
 # MedVault
 
 **Author:** Ahmed Furkhan
+**Class:** CS 5610 Web Development — Northeastern University
+**Class link:** https://johnguerra.co/classes/webDevelopment_online_summer_2026/
 
 **Design document:** [MedVault_Design_Document.docx](./design/MedVault_Design_Document.docx)
 
