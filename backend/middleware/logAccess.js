@@ -14,6 +14,9 @@ export default function logAccess(accessType) {
           const logEntry = {
             userId: req.user._id,
             recordId,
+            // REVIEW: accessorName/accessorRole are taken straight from client-supplied
+            // headers with no validation, so any caller can write arbitrary text into
+            // their own access log (e.g. someone else's name, HTML, etc).
             accessorName: req.headers['x-simulated-accessor'] || 'Unknown',
             accessorRole: req.headers['x-simulated-role'] || 'System',
             timestamp: new Date(),
