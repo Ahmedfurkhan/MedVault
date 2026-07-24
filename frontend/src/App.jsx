@@ -106,6 +106,9 @@ export default function App() {
 
   useEffect(() => {
     if (user) {
+      // REVIEW: offHoursStart/offHoursEnd are hardcoded here instead of reading
+      // user.preferences, so a saved custom off-hours window appears to revert
+      // to 23/5 every time the user logs in or the page reloads.
       setSettings({
         name: user.name || '',
         email: user.email || '',
