@@ -48,6 +48,9 @@ router.get('/api/records/:id', logAccess('view'), async (req, res) => {
 });
 
 router.post('/api/records', async (req, res) => {
+  // REVIEW: title/type/notes are inserted with no server-side validation, so a raw
+  // POST with an empty body (or missing title) creates a record with `title: undefined`.
+  // The frontend's `required` input only stops this from the UI, not from direct API calls.
   const { title, type, date, notes } = req.body;
   const newRecord = {
     userId: new ObjectId(req.user._id),
