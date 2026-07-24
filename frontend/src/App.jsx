@@ -117,6 +117,8 @@ export default function App() {
 
   const fetchTimeline = async (record) => {
     setActiveRecord(record);
+    // REVIEW: This is hardcoded, so every record view in the audit log gets attributed
+    // to "Dr. Evans / Endocrinologist" no matter who or what actually accessed it.
     await fetch(`${API_BASE}/api/records/${record._id}`, {
       credentials: 'include',
       headers: {
