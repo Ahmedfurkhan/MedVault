@@ -30,6 +30,9 @@ export default function LoginForm({ onLogin, onNav, onForgot }) {
       </div>
       {error && <p className="auth-error">{error}</p>}
       <form onSubmit={submit}>
+        {/* REVIEW: relies on placeholder text instead of an associated <label>, so
+            screen readers lose the field name once the user starts typing. Same
+            pattern repeats in RegisterForm and ForgotPasswordForm. */}
         <input
           type="email"
           value={email}
