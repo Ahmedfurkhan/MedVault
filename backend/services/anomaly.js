@@ -48,6 +48,10 @@ export async function evaluateRiskDashboard(userId) {
   const severityLabel =
     baseScore > 70 ? 'High Risk' : baseScore > 30 ? 'Moderate Risk' : 'Low Risk';
 
+  // REVIEW: this awaits explainAnomaly() one log at a time inside the loop, so on a
+  // user's first dashboard load (before anything is cached), load time scales linearly
+  // with the number of unexplained flagged alerts. Firing these with Promise.all instead
+  // would let them run concurrently.
   for (const log of flaggedLogs) {
     if (!log.aiSeverity) {
       const ai = await explainAnomaly(log);

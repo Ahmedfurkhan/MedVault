@@ -106,6 +106,9 @@ export default function App() {
 
   useEffect(() => {
     if (user) {
+      // REVIEW: offHoursStart/offHoursEnd are hardcoded here instead of reading
+      // user.preferences, so a saved custom off-hours window appears to revert
+      // to 23/5 every time the user logs in or the page reloads.
       setSettings({
         name: user.name || '',
         email: user.email || '',
@@ -117,6 +120,8 @@ export default function App() {
 
   const fetchTimeline = async (record) => {
     setActiveRecord(record);
+    // REVIEW: This is hardcoded, so every record view in the audit log gets attributed
+    // to "Dr. Evans / Endocrinologist" no matter who or what actually accessed it.
     await fetch(`${API_BASE}/api/records/${record._id}`, {
       credentials: 'include',
       headers: {
