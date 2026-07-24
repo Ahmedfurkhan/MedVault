@@ -31,6 +31,10 @@ export default function logAccess(accessType) {
           const currentHour = logEntry.timestamp.getHours();
           const offStart = req.user.preferences?.offHoursStart || 23;
           const offEnd = req.user.preferences?.offHoursEnd || 5;
+          // REVIEW: this OR only makes sense when offStart > offEnd (an overnight
+          // range that wraps past midnight, e.g. 23 -> 5). The Settings UI lets a user
+          // pick any 0-23 pair with no ordering constraint - e.g. offStart=9, offEnd=17
+          // makes this `hour >= 9 || hour < 17`, which is true for every hour of the day.
           if (currentHour >= offStart || currentHour < offEnd) {
             logEntry.isFlagged = true;
             logEntry.flags.push('OFF_HOURS');
