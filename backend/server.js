@@ -20,6 +20,8 @@ const port = Number(process.env.PORT || 5000);
 
 app.use(express.json());
 
+// Behind Render's proxy in production, trust X-Forwarded-Proto so `secure: 'auto'`
+// can correctly detect HTTPS.
 if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
 app.use(
   session({
@@ -29,8 +31,13 @@ app.use(
     cookie: {
       httpOnly: true,
       maxAge: 86400000,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      // 'auto' = mark the cookie Secure only when the request is actually HTTPS.
+      // This keeps login working over http://localhost even if NODE_ENV=production,
+      // while still using Secure cookies on the HTTPS deploy.
+      secure: 'auto',
+      // The frontend is served from the same Express origin, so 'lax' is sufficient
+      // and avoids the Secure-only requirement that 'none' imposes.
+      sameSite: 'lax',
     },
   })
 );

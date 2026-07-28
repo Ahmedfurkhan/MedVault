@@ -37,8 +37,15 @@
   color: var(--text);
 }
 .auth-card input:focus {
-  outline: none;
   border-color: var(--brand);
+}
+.auth-card input:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-color: var(--brand);
+}
+.auth-card input[aria-invalid='true'] {
+  border-color: var(--danger);
 }
 .auth-card button {
   padding: 10px 14px;

@@ -41,18 +41,25 @@ export default function ForgotPasswordForm({ onBack, onProceed }) {
         </p>
       </div>
       <form onSubmit={submit}>
+        <label className="sr-only" htmlFor="forgot-email">
+          Email
+        </label>
         <input
+          id="forgot-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
+          autoComplete="email"
           required
         />
         <button type="submit" disabled={sending}>
           Send reset link
         </button>
       </form>
-      {status && <p className="auth-note">{status}</p>}
+      <p className="auth-note" role="status" aria-live="polite">
+        {status}
+      </p>
       {devToken && (
         <div className="dev-reset">
           <p className="auth-note">

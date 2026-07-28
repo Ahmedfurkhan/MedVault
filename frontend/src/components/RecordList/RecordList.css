@@ -18,6 +18,18 @@
   cursor: pointer;
   font-weight: 700;
 }
+.record-status {
+  margin: 0 0 8px;
+  min-height: 1.2em;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--brand-text);
+}
+.record-card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 .record-card {
   background: var(--surface);
   padding: 16px;
@@ -79,7 +91,7 @@
   text-align: center;
   color: var(--text-muted);
 }
-.empty-state h4 {
+.empty-state h3 {
   margin-top: 0;
   margin-bottom: 6px;
   color: var(--text);

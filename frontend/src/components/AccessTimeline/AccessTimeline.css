@@ -52,6 +52,11 @@
 .timeline-none {
   color: var(--text-muted);
 }
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 .timeline-item {
   border-left: 3px solid var(--timeline-ok);
   padding: 8px 12px;
@@ -67,7 +72,7 @@
   border-left: 3px solid var(--timeline-flag);
   background: var(--timeline-flag-bg);
 }
-.timeline-alert {
+.timeline-item .timeline-alert {
   background: var(--sev-med-bg);
   padding: 8px 10px;
   color: var(--sev-med-fg);

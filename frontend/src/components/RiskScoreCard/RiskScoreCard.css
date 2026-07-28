@@ -27,6 +27,15 @@
   justify-content: center;
   margin: 0 auto 16px auto;
 }
+.circle-container.band-low {
+  border-color: var(--risk-low);
+}
+.circle-container.band-medium {
+  border-color: var(--risk-med);
+}
+.circle-container.band-high {
+  border-color: var(--risk-high);
+}
 .score-value {
   font-size: 2rem;
   font-weight: 700;
@@ -37,4 +46,17 @@
   padding: 4px 12px;
   border-radius: 20px;
   margin: 0;
+}
+/* Reuse the AA-checked severity tokens for the label pill. */
+.severity-text.band-low {
+  background: var(--sev-low-bg);
+  color: var(--sev-low-fg);
+}
+.severity-text.band-medium {
+  background: var(--sev-med-bg);
+  color: var(--sev-med-fg);
+}
+.severity-text.band-high {
+  background: var(--sev-high-bg);
+  color: var(--sev-high-fg);
 }

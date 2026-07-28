@@ -44,23 +44,41 @@ export default function ResetPasswordForm({ token, onDone, onBack }) {
         <h3>Set a new password</h3>
         <p className="auth-subtitle">Choose a new password for your account.</p>
       </div>
-      {error && <p className="auth-error">{error}</p>}
+      {error && (
+        <p className="auth-error" id="reset-error" role="alert">
+          {error}
+        </p>
+      )}
       <form onSubmit={submit}>
+        <label className="sr-only" htmlFor="reset-password">
+          New password
+        </label>
         <input
+          id="reset-password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="New password"
+          autoComplete="new-password"
           minLength={6}
           required
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'reset-error' : undefined}
         />
+        <label className="sr-only" htmlFor="reset-confirm">
+          Confirm new password
+        </label>
         <input
+          id="reset-confirm"
           type="password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           placeholder="Confirm new password"
+          autoComplete="new-password"
           minLength={6}
           required
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'reset-error' : undefined}
         />
         <button type="submit" disabled={saving}>
           Reset password

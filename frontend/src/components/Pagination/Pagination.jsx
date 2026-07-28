@@ -6,16 +6,17 @@ export default function Pagination({ page, totalPages, onPageChange }) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="pagination">
+    <nav className="pagination" aria-label="Records pagination">
       <button
         type="button"
         className="page-btn"
         onClick={() => onPageChange(page - 1)}
         disabled={page <= 1}
+        aria-label="Go to previous page"
       >
         Previous
       </button>
-      <span className="page-status">
+      <span className="page-status" aria-live="polite">
         Page {page} of {totalPages}
       </span>
       <button
@@ -23,10 +24,11 @@ export default function Pagination({ page, totalPages, onPageChange }) {
         className="page-btn"
         onClick={() => onPageChange(page + 1)}
         disabled={page >= totalPages}
+        aria-label="Go to next page"
       >
         Next
       </button>
-    </div>
+    </nav>
   );
 }
 

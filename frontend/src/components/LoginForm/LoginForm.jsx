@@ -28,21 +28,39 @@ export default function LoginForm({ onLogin, onNav, onForgot }) {
         <h3>Welcome back</h3>
         <p className="auth-subtitle">Access your records and review your audit trail.</p>
       </div>
-      {error && <p className="auth-error">{error}</p>}
+      {error && (
+        <p className="auth-error" id="login-error" role="alert">
+          {error}
+        </p>
+      )}
       <form onSubmit={submit}>
+        <label className="sr-only" htmlFor="login-email">
+          Email
+        </label>
         <input
+          id="login-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
+          autoComplete="email"
           required
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'login-error' : undefined}
         />
+        <label className="sr-only" htmlFor="login-password">
+          Password
+        </label>
         <input
+          id="login-password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
+          autoComplete="current-password"
           required
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'login-error' : undefined}
         />
         <button type="submit">Login</button>
       </form>

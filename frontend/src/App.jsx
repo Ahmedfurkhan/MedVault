@@ -171,26 +171,51 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <header className="app-header">
         <div className="brand">
-          <div className="brand-mark">🛡️</div>
+          <div className="brand-mark" aria-hidden="true">
+            🛡️
+          </div>
           <div>
-            <h2>MedVault</h2>
+            <h1>MedVault</h1>
             <p>AI-powered secure patient data access auditor</p>
           </div>
         </div>
         {user ? (
-          <nav id="primary-nav" className={`app-nav nav-menu ${menuOpen ? 'open' : ''}`}>
-            <button type="button" onClick={() => go('portal')}>
+          <nav
+            id="primary-nav"
+            aria-label="Primary"
+            className={`app-nav nav-menu ${menuOpen ? 'open' : ''}`}
+          >
+            <button
+              type="button"
+              onClick={() => go('portal')}
+              aria-current={view === 'portal' ? 'page' : undefined}
+            >
               My Records
             </button>
-            <button type="button" onClick={() => go('dashboard')}>
+            <button
+              type="button"
+              onClick={() => go('dashboard')}
+              aria-current={view === 'dashboard' ? 'page' : undefined}
+            >
               Dashboard
             </button>
-            <button type="button" onClick={() => go('assistant')}>
+            <button
+              type="button"
+              onClick={() => go('assistant')}
+              aria-current={view === 'assistant' ? 'page' : undefined}
+            >
               Assistant
             </button>
-            <button type="button" onClick={() => go('settings')}>
+            <button
+              type="button"
+              onClick={() => go('settings')}
+              aria-current={view === 'settings' ? 'page' : undefined}
+            >
               Settings
             </button>
             <span className="user-pill">Hi, {user.name}</span>
@@ -229,12 +254,12 @@ export default function App() {
         </div>
       </header>
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         {view === 'login' && (
           <div className="auth-shell">
             <div className="hero-panel">
               <p className="eyebrow">Security meets empathy</p>
-              <h3>See who touched your medical records and why.</h3>
+              <h2>See who touched your medical records and why.</h2>
               <p>MedVault turns access logs into a clear, patient-friendly audit experience.</p>
               <ul>
                 <li>Track every record interaction</li>
@@ -256,7 +281,7 @@ export default function App() {
           <div className="auth-shell">
             <div className="hero-panel">
               <p className="eyebrow">Account recovery</p>
-              <h3>Locked out? Reset your password.</h3>
+              <h2>Locked out? Reset your password.</h2>
               <p>We&apos;ll generate a secure, time-limited link so you can set a new password.</p>
             </div>
             <ForgotPasswordForm
@@ -272,7 +297,7 @@ export default function App() {
           <div className="auth-shell">
             <div className="hero-panel">
               <p className="eyebrow">Account recovery</p>
-              <h3>Choose a new password.</h3>
+              <h2>Choose a new password.</h2>
               <p>Set a new password to regain access to your records.</p>
             </div>
             <ResetPasswordForm
@@ -289,7 +314,7 @@ export default function App() {
           <div className="auth-shell">
             <div className="hero-panel">
               <p className="eyebrow">Create your secure account</p>
-              <h3>Take control of your medical record transparency.</h3>
+              <h2>Take control of your medical record transparency.</h2>
               <p>Register once and start monitoring every access event around your care.</p>
             </div>
             <RegisterForm
@@ -305,7 +330,7 @@ export default function App() {
           <div className="portal-view">
             <div className="hero-panel portal-hero">
               <p className="eyebrow">Protected portal</p>
-              <h3>Monitor your health history with transparency.</h3>
+              <h2>Monitor your health history with transparency.</h2>
               <p>
                 Review records, inspect access events, and keep suspicious activity visible in plain
                 language.
@@ -355,59 +380,84 @@ export default function App() {
           <div className="settings-shell">
             <div className="settings-card">
               <p className="eyebrow">Profile & Settings</p>
-              <h3>Manage your account preferences</h3>
+              <h2>Manage your account preferences</h2>
               <p className="settings-subtitle">
                 Keep your profile details up to date and tune the off-hours window used by the
                 anomaly rules.
               </p>
 
-              <div className="settings-grid">
-                <label>
+              <form
+                className="settings-grid"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSaveSettings();
+                }}
+              >
+                <label htmlFor="settings-name">
                   <span>Full name</span>
                   <input
+                    id="settings-name"
+                    name="name"
+                    autoComplete="name"
                     value={settings.name}
                     onChange={(e) => setSettings({ ...settings, name: e.target.value })}
                   />
                 </label>
-                <label>
+                <label htmlFor="settings-email">
                   <span>Email</span>
-                  <input value={settings.email} disabled readOnly />
+                  <input
+                    id="settings-email"
+                    name="email"
+                    autoComplete="email"
+                    value={settings.email}
+                    disabled
+                    readOnly
+                  />
                 </label>
-                <label>
+                <label htmlFor="settings-offhours-start">
                   <span>Off-hours start</span>
                   <input
+                    id="settings-offhours-start"
                     type="number"
                     min="0"
                     max="23"
+                    aria-describedby="offhours-hint"
                     value={settings.offHoursStart}
                     onChange={(e) =>
                       setSettings({ ...settings, offHoursStart: Number(e.target.value) })
                     }
                   />
                 </label>
-                <label>
+                <label htmlFor="settings-offhours-end">
                   <span>Off-hours end</span>
                   <input
+                    id="settings-offhours-end"
                     type="number"
                     min="0"
                     max="23"
+                    aria-describedby="offhours-hint"
                     value={settings.offHoursEnd}
                     onChange={(e) =>
                       setSettings({ ...settings, offHoursEnd: Number(e.target.value) })
                     }
                   />
                 </label>
-              </div>
+                <p id="offhours-hint" className="settings-hint">
+                  Use a 24-hour clock (0–23). Access during this window is treated as off-hours.
+                </p>
 
-              <div className="settings-actions">
-                {settingsStatus && <span className="settings-status">{settingsStatus}</span>}
-                <button type="button" className="secondary-btn" onClick={() => setView('portal')}>
-                  Back to records
-                </button>
-                <button type="button" className="primary-btn" onClick={handleSaveSettings}>
-                  Save changes
-                </button>
-              </div>
+                <div className="settings-actions">
+                  <span className="settings-status" role="status" aria-live="polite">
+                    {settingsStatus}
+                  </span>
+                  <button type="button" className="secondary-btn" onClick={() => setView('portal')}>
+                    Back to records
+                  </button>
+                  <button type="submit" className="primary-btn">
+                    Save changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

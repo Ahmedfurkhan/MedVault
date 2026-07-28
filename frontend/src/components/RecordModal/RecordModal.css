@@ -49,7 +49,13 @@
 .modal-content input:focus,
 .modal-content select:focus,
 .modal-content textarea:focus {
-  outline: none;
+  border-color: var(--brand);
+}
+.modal-content input:focus-visible,
+.modal-content select:focus-visible,
+.modal-content textarea:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
   border-color: var(--brand);
 }
 .modal-actions {
@@ -57,12 +63,27 @@
   justify-content: space-between;
   margin-top: 8px;
 }
+.delete-confirm {
+  margin-top: 8px;
+  padding: 14px;
+  border: 1px solid var(--sev-high-bg);
+  background: var(--sev-high-bg);
+  border-radius: 12px;
+}
+.delete-confirm-text {
+  margin: 0 0 12px;
+  color: var(--sev-high-fg);
+  font-weight: 600;
+}
+.delete-confirm .right-actions {
+  justify-content: flex-end;
+}
 .right-actions {
   display: flex;
   gap: 8px;
 }
 .delete-btn {
-  background: var(--danger);
+  background: var(--danger-solid);
   color: #ffffff;
   border: none;
   padding: 9px 14px;

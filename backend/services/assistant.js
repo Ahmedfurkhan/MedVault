@@ -37,7 +37,13 @@ Patient question: ${question}`;
       }),
     });
     const data = await response.json();
-    return data.choices[0].message.content.trim();
+    const content = data?.choices?.[0]?.message?.content;
+    if (!response.ok || !content) {
+      const reason = data?.error?.code || data?.error?.message || `HTTP ${response.status}`;
+      console.warn(`Assistant AI unavailable (${reason}).`);
+      return "Sorry, I couldn't process that right now. Please try again.";
+    }
+    return content.trim();
   } catch (err) {
     console.error('Assistant AI failed', err);
     return "Sorry, I couldn't process that right now. Please try again.";

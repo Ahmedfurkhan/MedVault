@@ -31,28 +31,54 @@ export default function RegisterForm({ onRegister, onNav }) {
           Register once and begin tracking access transparency in real time.
         </p>
       </div>
-      {error && <p className="auth-error">{error}</p>}
+      {error && (
+        <p className="auth-error" id="register-error" role="alert">
+          {error}
+        </p>
+      )}
       <form onSubmit={submit}>
+        <label className="sr-only" htmlFor="register-name">
+          Full name
+        </label>
         <input
+          id="register-name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Name"
+          autoComplete="name"
           required
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'register-error' : undefined}
         />
+        <label className="sr-only" htmlFor="register-email">
+          Email
+        </label>
         <input
+          id="register-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
+          autoComplete="email"
           required
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'register-error' : undefined}
         />
+        <label className="sr-only" htmlFor="register-password">
+          Password
+        </label>
         <input
+          id="register-password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
+          placeholder="Password (at least 6 characters)"
+          autoComplete="new-password"
+          minLength={6}
           required
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'register-error' : undefined}
         />
         <button type="submit">Register</button>
       </form>

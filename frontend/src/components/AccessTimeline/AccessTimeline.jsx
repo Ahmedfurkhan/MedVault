@@ -27,16 +27,21 @@ export default function AccessTimeline({ logs, title }) {
   });
 
   return (
-    <div className="timeline-card">
-      <h3>TIMELINE: {title}</h3>
+    <section className="timeline-card" aria-labelledby="timeline-heading">
+      <h3 id="timeline-heading">Access timeline: {title}</h3>
       <div className="timeline-filter">
-        <label>
+        <label htmlFor="timeline-from">
           <span>From</span>
-          <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          <input
+            id="timeline-from"
+            type="date"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+          />
         </label>
-        <label>
+        <label htmlFor="timeline-to">
           <span>To</span>
-          <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+          <input id="timeline-to" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
         </label>
         {(from || to) && (
           <button
@@ -51,25 +56,35 @@ export default function AccessTimeline({ logs, title }) {
           </button>
         )}
       </div>
-      {filtered.length === 0 ? (
-        <p className="timeline-none">No access events in this date range.</p>
-      ) : (
-        filtered.map((l) => (
-          <div key={l._id} className={`timeline-item ${l.isFlagged ? 'flagged' : ''}`}>
-            <strong>
-              {l.accessorName} ({l.accessorRole})
-            </strong>{' '}
-            - {new Date(l.timestamp).toLocaleString()}
-            <p>
-              IP: {l.ipAddress} | Device: {l.device} | Type: {l.accessType}
-            </p>
-            {l.isFlagged && (
-              <div className="timeline-alert">{l.aiExplanation || 'Flagged for review.'}</div>
-            )}
-          </div>
-        ))
-      )}
-    </div>
+      <div aria-live="polite">
+        {filtered.length === 0 ? (
+          <p className="timeline-none">No access events in this date range.</p>
+        ) : (
+          <ul className="timeline-list">
+            {filtered.map((l) => (
+              <li key={l._id} className={`timeline-item ${l.isFlagged ? 'flagged' : ''}`}>
+                {l.isFlagged && <span className="sr-only">Flagged access event. </span>}
+                <strong>
+                  {l.accessorName} ({l.accessorRole})
+                </strong>{' '}
+                - {new Date(l.timestamp).toLocaleString()}
+                <p>
+                  IP: {l.ipAddress} | Device: {l.device} | Type: {l.accessType}
+                </p>
+                {l.isFlagged && (
+                  <p className="timeline-alert" role="note">
+                    <span className="timeline-alert-icon" aria-hidden="true">
+                      ⚠️
+                    </span>{' '}
+                    {l.aiExplanation || 'Flagged for review.'}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
   );
 }
 

@@ -23,8 +23,98 @@ async function seed() {
   };
   await db.collection('users').insertOne(user);
 
-  // create many records for the user (1,000)
-  const roles = ['Dr. Evans', 'Dr. Smith', 'Nurse Joy', 'Admin Staff'];
+  // Realistic synthetic medical records, grouped by record type. Titles and notes
+  // read like a real patient chart instead of "Record #1".
+  const recordTemplates = {
+    Condition: [
+      {
+        title: 'Type 2 Diabetes Mellitus',
+        notes: 'Managed with metformin; monitor HbA1c quarterly.',
+      },
+      {
+        title: 'Essential Hypertension',
+        notes: 'Blood pressure controlled on lisinopril 10mg daily.',
+      },
+      {
+        title: 'Asthma (Mild Persistent)',
+        notes: 'Albuterol inhaler as needed; no recent exacerbations.',
+      },
+      { title: 'Hypothyroidism', notes: 'On levothyroxine; TSH within target range.' },
+      { title: 'Migraine (Episodic)', notes: 'Prescribed sumatriptan for acute attacks.' },
+      { title: 'GERD', notes: 'Symptoms improved with omeprazole and dietary changes.' },
+      {
+        title: 'Seasonal Allergic Rhinitis',
+        notes: 'Responds well to antihistamines during spring.',
+      },
+      {
+        title: 'Iron-deficiency Anemia',
+        notes: 'Started oral iron; recheck ferritin in 3 months.',
+      },
+      {
+        title: 'Osteoarthritis of the Knee',
+        notes: 'Managed with physical therapy and NSAIDs as needed.',
+      },
+      {
+        title: 'Hyperlipidemia',
+        notes: 'LDL elevated; initiated atorvastatin and lifestyle counseling.',
+      },
+    ],
+    'Lab Result': [
+      { title: 'Complete Blood Count (CBC)', notes: 'All values within normal limits.' },
+      { title: 'Lipid Panel', notes: 'Total cholesterol 210 mg/dL; LDL mildly elevated.' },
+      { title: 'Hemoglobin A1c', notes: 'Result 6.8%; consistent with controlled diabetes.' },
+      { title: 'Thyroid Panel (TSH)', notes: 'TSH 2.1 mIU/L; normal thyroid function.' },
+      { title: 'Vitamin D, 25-Hydroxy', notes: 'Level 22 ng/mL; supplementation recommended.' },
+      { title: 'Basic Metabolic Panel', notes: 'Electrolytes and kidney function normal.' },
+      { title: 'Liver Function Tests', notes: 'AST and ALT within normal range.' },
+      { title: 'Urinalysis', notes: 'No signs of infection; results unremarkable.' },
+      { title: 'Ferritin Level', notes: 'Improved from prior result; continue iron therapy.' },
+      { title: 'Fasting Glucose', notes: 'Result 98 mg/dL; within normal fasting range.' },
+    ],
+    'Visit Note': [
+      {
+        title: 'Annual Physical Exam',
+        notes: 'Routine wellness visit; vitals stable, no acute concerns.',
+      },
+      { title: 'Cardiology Follow-up', notes: 'Reviewed BP logs; medication regimen unchanged.' },
+      {
+        title: 'Dermatology Consultation',
+        notes: 'Benign nevus noted; routine monitoring advised.',
+      },
+      {
+        title: 'Influenza Vaccination',
+        notes: 'Seasonal flu shot administered; no adverse reaction.',
+      },
+      { title: 'Telehealth Check-in', notes: 'Discussed symptom management via video visit.' },
+      { title: 'Endocrinology Follow-up', notes: 'Diabetes management reviewed; labs ordered.' },
+      {
+        title: 'Orthopedic Consultation',
+        notes: 'Evaluated knee pain; imaging and PT recommended.',
+      },
+      {
+        title: 'Nutrition Counseling',
+        notes: 'Dietary plan discussed to support cholesterol goals.',
+      },
+      { title: 'Pre-operative Assessment', notes: 'Cleared for outpatient procedure.' },
+      {
+        title: 'Emergency Department Summary',
+        notes: 'Evaluated for chest pain; discharged, follow up with PCP.',
+      },
+    ],
+  };
+  const recordTypes = ['Condition', 'Lab Result', 'Visit Note'];
+
+  // Realistic accessors (name + clinical role) shown in the access timeline.
+  const accessors = [
+    { name: 'Dr. Alan Evans', role: 'Endocrinologist' },
+    { name: 'Dr. Priya Patel', role: 'Primary Care Physician' },
+    { name: 'Dr. Marcus Smith', role: 'Cardiologist' },
+    { name: 'Joy Rivera, RN', role: 'Registered Nurse' },
+    { name: 'Dana Kim', role: 'Records Administrator' },
+    { name: 'Dr. Sofia Nguyen', role: 'Radiologist' },
+    { name: 'Dr. Omar Haddad', role: 'Dermatologist' },
+    { name: 'Metro Lab Services', role: 'Laboratory Technician' },
+  ];
   const knownDevices = ['Chrome on Windows', 'Safari on iPhone', 'Chrome on Mac'];
   const now = Date.now();
 
@@ -32,13 +122,16 @@ async function seed() {
   const logs = [];
   for (let r = 0; r < 1000; r++) {
     const recId = new ObjectId();
+    const type = recordTypes[r % recordTypes.length];
+    const pool = recordTemplates[type];
+    const template = pool[Math.floor(r / recordTypes.length) % pool.length];
     const rec = {
       _id: recId,
       userId: user._id,
-      title: `Record #${r + 1}`,
-      type: ['Condition', 'Lab Result', 'Visit Note'][r % 3],
+      title: template.title,
+      type,
       date: new Date(now - r * 24 * 3600 * 1000),
-      notes: `Synthetic record ${r + 1}`,
+      notes: template.notes,
     };
     records.push(rec);
 
@@ -56,11 +149,12 @@ async function seed() {
       if (isOffHours) flags.push('OFF_HOURS');
       if (isNewDevice) flags.push('NEW_DEVICE');
 
+      const accessor = accessors[idx % accessors.length];
       logs.push({
         userId: user._id,
         recordId: recId.toString(),
-        accessorName: roles[idx % roles.length],
-        accessorRole: 'Clinical',
+        accessorName: accessor.name,
+        accessorRole: accessor.role,
         timestamp: date,
         ipAddress: `192.168.1.${idx % 255}`,
         device: isNewDevice

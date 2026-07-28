@@ -4,7 +4,7 @@ import './SearchBar.css';
 
 export default function SearchBar({ value, onChange, placeholder }) {
   return (
-    <div className="search-bar">
+    <div className="search-bar" role="search">
       <span className="search-icon" aria-hidden="true">
         🔍
       </span>

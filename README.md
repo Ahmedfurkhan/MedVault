@@ -10,6 +10,8 @@
 
 **Presentation:** [MedVault_Presentation.pptx](./design/MedVault_Presentation.pptx)
 
+**Usability study report:** [MedVault_Usability_Study_Report.docx](./design/MedVault_Usability_Study_Report.docx)
+
 **Deploy Link:** [https://medvault-jh8r.onrender.com/](https://medvault-jh8r.onrender.com/)
 
 ## Project Objective
@@ -122,6 +124,36 @@ docker run --env MONGO_URI=... --env SESSION_SECRET=... --env GROQ_API_KEY=... -
 - Default seeded credentials: `maria@gmail.com` / `password123`.
 - Secrets are read from environment variables and are never committed. `backend/.env` is git-ignored; only `backend/.env.example` (placeholders) is tracked.
 - The frontend optionally reads `VITE_API_BASE` for a custom production API origin; leave it unset to use the same origin.
+
+## Design & Accessibility
+
+This iteration focused on design, usability, and accessibility:
+
+- **Typography:** a two-face system — **Sora** for display headings and **Inter** for body — loaded from Google Fonts, with a corrected `h1 → h2 → h3` heading hierarchy (no skipped levels).
+- **Color:** a consistent teal brand palette (`--brand` / `--brand-grad`) with fixed approve (teal) vs. cancel/destructive (red `--danger`) semantics across every screen, plus theme-aware, WCAG-AA risk-band colors and full light/dark support.
+- **Keyboard:** the whole app is operable without a mouse — a "Skip to main content" link, a single high-contrast `:focus-visible` ring everywhere, `aria-current` on the active nav item, and a true modal dialog (focus trap, `Escape` to close, focus restored to the trigger).
+- **Screen readers:** every input has a programmatic `<label>` and `autocomplete`; the risk gauge is a labelled `role="meter"`; the trend chart has a text alternative; flagged events are announced by more than color; and live regions announce assistant replies, pagination, and save status.
+- **Verified:** ESLint clean, Prettier-formatted, and **0 axe-core violations** across all views in both light and dark themes.
+
+### CRAP principles
+
+- **Contrast:** primary (teal, filled) vs. secondary (outline) vs. destructive (red) actions are visually very different, never merely similar; type sizes step clearly between heading and body.
+- **Repetition:** shared design tokens (color, radius `999px` pills, spacing, shadow, focus ring) are reused across every component, so the UI reads as one system.
+- **Alignment:** content sits on a consistent left-aligned grid within cards; the portal and dashboard use a real column grid rather than ad-hoc centering.
+- **Proximity:** related controls are grouped (search + list + pagination in one column; a record and its timeline side by side; form fields with their labels), with generous whitespace separating unrelated groups.
+
+### Shneiderman's 8 Golden Rules
+
+1. **Strive for consistency** — one component/token system, consistent nav and button semantics.
+2. **Cater to universal usability** — full keyboard operation, screen-reader labels, light/dark, responsive/mobile menu.
+3. **Offer informative feedback** — live-region status for saves ("Record added / Changes saved / Record deleted"), assistant typing, and pagination.
+4. **Design dialogs to yield closure** — the record dialog and the delete-confirmation both resolve to a clear end state and a confirmation message.
+5. **Prevent errors** — required fields, typed inputs (date/number with min–max), and a two-step confirmation before a destructive delete.
+6. **Permit easy reversal of actions** — every dialog has Cancel; delete asks first with a "Keep record" escape; Escape closes dialogs.
+7. **Support internal locus of control** — the user drives navigation and actions; nothing auto-submits or auto-centers unexpectedly.
+8. **Reduce short-term memory load** — persistent field labels (not placeholder-only), a visible active-nav indicator, suggested assistant prompts, and inline hints (e.g., the off-hours window explanation).
+
+See the [usability study report](./design/MedVault_Usability_Study_Report.docx) for the study that motivated these changes.
 
 ## License
 

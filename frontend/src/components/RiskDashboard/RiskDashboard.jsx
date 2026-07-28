@@ -32,27 +32,33 @@ export default function RiskDashboard({ data, theme = 'light' }) {
           anomalyFill: 'rgba(239, 68, 68, 0.1)',
         };
 
+  const totalViews = data.trendData.reduce((sum, d) => sum + (d.accessCount || 0), 0);
+  const totalFlags = data.trendData.reduce((sum, d) => sum + (d.flagCount || 0), 0);
+  const chartSummary = `Trend of daily record access over ${data.trendData.length} days: ${totalViews} total views and ${totalFlags} flagged anomalies.`;
+
   return (
     <div className="dashboard-layout">
+      <h2 className="sr-only">Security and risk dashboard</h2>
       <div className="metrics-row">
         <RiskScoreCard score={data.riskScore} severity={data.severityLabel} />
         <div className="stat-card">
-          <h4>OFF-HOURS INCIDENTS</h4>
+          <h3>OFF-HOURS INCIDENTS</h3>
           <span className="stat-count">{data.offHoursCount}</span>
         </div>
         <div className="stat-card">
-          <h4>RECENT VIEW BURSTS</h4>
+          <h3>RECENT VIEW BURSTS</h3>
           <span className="stat-count">{data.viewBurstCount}</span>
         </div>
         <div className="stat-card">
-          <h4>NEW-DEVICE ALERTS</h4>
+          <h3>NEW-DEVICE ALERTS</h3>
           <span className="stat-count">{data.newDeviceCount}</span>
         </div>
       </div>
 
-      <div className="chart-section">
-        <h3>ACCESS VOLUME &amp; FLAGS TREND</h3>
-        <div style={{ width: '100%', height: 250 }}>
+      <section className="chart-section" aria-labelledby="trend-heading">
+        <h3 id="trend-heading">ACCESS VOLUME &amp; FLAGS TREND</h3>
+        <p className="sr-only">{chartSummary}</p>
+        <div style={{ width: '100%', height: 250 }} aria-hidden="true">
           <ResponsiveContainer>
             <AreaChart data={data.trendData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
@@ -83,14 +89,16 @@ export default function RiskDashboard({ data, theme = 'light' }) {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </section>
 
-      <div className="alerts-section">
-        <h3>SECURITY ALERTS (AI EXPLAINED)</h3>
-        <div className="alert-list">
+      <section className="alerts-section" aria-labelledby="alerts-heading">
+        <h3 id="alerts-heading">SECURITY ALERTS (AI EXPLAINED)</h3>
+        <ul className="alert-list">
           {data.alerts.map((alert) => (
-            <div key={alert._id} className="alert-row">
-              <span className="alert-indicator">⚠️</span>
+            <li key={alert._id} className="alert-row">
+              <span className="alert-indicator" aria-hidden="true">
+                ⚠️
+              </span>
               <div className="alert-text">
                 <div className="alert-head">
                   <p className="alert-desc">
@@ -114,10 +122,10 @@ export default function RiskDashboard({ data, theme = 'light' }) {
                   {new Date(alert.timestamp).toLocaleString()} | IP: {alert.ipAddress}
                 </span>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </section>
     </div>
   );
 }
