@@ -8,8 +8,19 @@ export default function RecordModal({ record, onClose, onSaved }) {
   const [type, setType] = useState('Condition');
   const [date, setDate] = useState('');
   const [notes, setNotes] = useState('');
+  // Attachment: a newly selected file (as a data URL) and/or the existing one.
+  const [fileData, setFileData] = useState(null);
+  const [fileName, setFileName] = useState('');
+  const [fileError, setFileError] = useState('');
+  const [removeExisting, setRemoveExisting] = useState(false);
+  const [saveError, setSaveError] = useState('');
   // Two-step delete guards against an accidental, irreversible action.
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  const existingAttachment =
+    record && record.attachment && !removeExisting && !fileData ? record.attachment : null;
+  const MAX_FILE_BYTES = 5 * 1024 * 1024;
+  const ALLOWED = ['application/pdf', 'image/png', 'image/jpeg'];
 
   const dialogRef = useRef(null);
   const titleInputRef = useRef(null);
@@ -30,7 +41,36 @@ export default function RecordModal({ record, onClose, onSaved }) {
       setDate('');
       setNotes('');
     }
+    setFileData(null);
+    setFileName('');
+    setFileError('');
+    setRemoveExisting(false);
+    setSaveError('');
   }, [record]);
+
+  const handleFileChange = (e) => {
+    setFileError('');
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!ALLOWED.includes(file.type)) {
+      setFileError('Only PDF, JPG, or PNG files are allowed.');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      setFileError('File must be 5 MB or smaller.');
+      e.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFileData(reader.result);
+      setFileName(file.name);
+      setRemoveExisting(false);
+    };
+    reader.onerror = () => setFileError('Could not read that file. Please try again.');
+    reader.readAsDataURL(file);
+  };
 
   // Move focus into the dialog on open and restore it to the trigger on close.
   useEffect(() => {
@@ -71,8 +111,15 @@ export default function RecordModal({ record, onClose, onSaved }) {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setSaveError('');
     const url = record ? `${API_BASE}/api/records/${record._id}` : `${API_BASE}/api/records`;
     const payload = { title, type, date, notes };
+    if (fileData) {
+      payload.attachment = fileData;
+      payload.attachmentName = fileName;
+    } else if (record && removeExisting) {
+      payload.removeAttachment = true;
+    }
     const res = await fetch(url, {
       method: record ? 'PUT' : 'POST',
       credentials: 'include',
@@ -82,6 +129,9 @@ export default function RecordModal({ record, onClose, onSaved }) {
     if (res.ok) {
       onSaved(record ? 'Changes saved.' : 'Record added.');
       onClose();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setSaveError(data.error || 'Could not save the record. Please try again.');
     }
   };
 
@@ -144,6 +194,62 @@ export default function RecordModal({ record, onClose, onSaved }) {
             onChange={(e) => setNotes(e.target.value)}
             rows="3"
           />
+
+          <label htmlFor="record-attachment">Report file (PDF, JPG, or PNG)</label>
+          {existingAttachment && (
+            <div className="attachment-current">
+              <a
+                href={`${API_BASE}/api/records/${record._id}/attachment`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="attachment-link"
+              >
+                📎 View current report ({existingAttachment.fileName})
+              </a>
+              <button
+                type="button"
+                className="attachment-remove"
+                onClick={() => setRemoveExisting(true)}
+              >
+                Remove
+              </button>
+            </div>
+          )}
+          {fileData && (
+            <p className="attachment-selected">
+              Selected: {fileName}{' '}
+              <button
+                type="button"
+                className="attachment-remove"
+                onClick={() => {
+                  setFileData(null);
+                  setFileName('');
+                }}
+              >
+                Clear
+              </button>
+            </p>
+          )}
+          <input
+            id="record-attachment"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/png,image/jpeg"
+            onChange={handleFileChange}
+            aria-describedby="record-attachment-hint"
+          />
+          <p id="record-attachment-hint" className="attachment-hint">
+            Optional. Attach a scan or photo of the report — up to 5 MB.
+          </p>
+          {fileError && (
+            <p className="attachment-error" role="alert">
+              {fileError}
+            </p>
+          )}
+          {saveError && (
+            <p className="attachment-error" role="alert">
+              {saveError}
+            </p>
+          )}
 
           {confirmingDelete ? (
             <div className="delete-confirm" role="alertdialog" aria-label="Confirm delete">

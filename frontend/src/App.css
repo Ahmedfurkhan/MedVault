@@ -237,14 +237,29 @@ h4 {
   color: var(--brand-contrast);
   border-color: transparent;
 }
-.brand-badge,
-.user-pill {
+.brand-badge {
   padding: 8px 12px;
   border-radius: 999px;
   background: var(--surface-2);
   color: var(--brand-text);
   font-weight: 600;
   font-size: 0.9rem;
+}
+/* Greeting label (first in the nav): plain text, vertically centered, and set
+   off from the nav buttons with a divider on its right so it reads as an
+   account label, not a button. */
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  align-self: stretch;
+  margin-right: 6px;
+  padding-right: 14px;
+  border-right: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 .logout-btn {
   color: var(--danger) !important;
@@ -489,10 +504,12 @@ h4 {
   .nav-menu button,
   .nav-menu .user-pill {
     width: 100%;
+    justify-content: center;
     text-align: center;
-  }
-  .nav-menu .user-pill {
-    order: -1;
+    /* No divider / side padding in the stacked mobile menu. */
+    margin-right: 0;
+    padding-right: 0;
+    border-right: none;
   }
 }
 

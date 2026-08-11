@@ -9,6 +9,7 @@ import Pagination from './components/Pagination/Pagination';
 import AccessTimeline from './components/AccessTimeline/AccessTimeline';
 import RiskDashboard from './components/RiskDashboard/RiskDashboard';
 import AssistantChat from './components/AssistantChat/AssistantChat';
+import DoctorPortal from './components/DoctorPortal/DoctorPortal';
 import './App.css';
 import API_BASE from './apiBase';
 
@@ -64,7 +65,7 @@ export default function App() {
       .then((data) => {
         if (data) {
           setUser(data);
-          if (!resetFlow.current) setView('portal');
+          if (!resetFlow.current) setView(data.role === 'doctor' ? 'doctor' : 'portal');
         }
       });
   }, []);
@@ -169,6 +170,8 @@ export default function App() {
     });
   };
 
+  const isDoctor = user?.role === 'doctor';
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -184,12 +187,28 @@ export default function App() {
             <p>AI-powered secure patient data access auditor</p>
           </div>
         </div>
-        {user ? (
+        {user && isDoctor ? (
           <nav
             id="primary-nav"
             aria-label="Primary"
             className={`app-nav nav-menu ${menuOpen ? 'open' : ''}`}
           >
+            <span className="user-pill">
+              {user.name}
+              {user.specialty ? ` · ${user.specialty}` : ''}
+            </span>
+            <span className="brand-badge">Provider portal</span>
+            <button type="button" className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </nav>
+        ) : user ? (
+          <nav
+            id="primary-nav"
+            aria-label="Primary"
+            className={`app-nav nav-menu ${menuOpen ? 'open' : ''}`}
+          >
+            <span className="user-pill">Hi, {user.name}</span>
             <button
               type="button"
               onClick={() => go('portal')}
@@ -218,7 +237,6 @@ export default function App() {
             >
               Settings
             </button>
-            <span className="user-pill">Hi, {user.name}</span>
             <button type="button" className="logout-btn" onClick={handleLogout}>
               Logout
             </button>
@@ -270,7 +288,7 @@ export default function App() {
             <LoginForm
               onLogin={(u) => {
                 setUser(u);
-                setView('portal');
+                setView(u.role === 'doctor' ? 'doctor' : 'portal');
               }}
               onNav={() => setView('register')}
               onForgot={() => setView('forgot')}
@@ -320,7 +338,7 @@ export default function App() {
             <RegisterForm
               onRegister={(u) => {
                 setUser(u);
-                setView('portal');
+                setView(u.role === 'doctor' ? 'doctor' : 'portal');
               }}
               onNav={() => setView('login')}
             />
@@ -461,6 +479,7 @@ export default function App() {
             </div>
           </div>
         )}
+        {view === 'doctor' && user && isDoctor && <DoctorPortal />}
       </main>
     </div>
   );

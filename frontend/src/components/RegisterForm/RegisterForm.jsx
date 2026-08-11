@@ -7,6 +7,8 @@ export default function RegisterForm({ onRegister, onNav }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('patient');
+  const [specialty, setSpecialty] = useState('');
   const [error, setError] = useState('');
 
   const submit = async (e) => {
@@ -15,7 +17,7 @@ export default function RegisterForm({ onRegister, onNav }) {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, role, specialty }),
     });
     const data = await res.json();
     if (!res.ok) setError(data.error);
@@ -80,6 +82,45 @@ export default function RegisterForm({ onRegister, onNav }) {
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? 'register-error' : undefined}
         />
+
+        <fieldset className="role-fieldset">
+          <legend>I am registering as a</legend>
+          <label className="role-option">
+            <input
+              type="radio"
+              name="role"
+              value="patient"
+              checked={role === 'patient'}
+              onChange={() => setRole('patient')}
+            />
+            <span>Patient</span>
+          </label>
+          <label className="role-option">
+            <input
+              type="radio"
+              name="role"
+              value="doctor"
+              checked={role === 'doctor'}
+              onChange={() => setRole('doctor')}
+            />
+            <span>Doctor</span>
+          </label>
+        </fieldset>
+        {role === 'doctor' && (
+          <>
+            <label className="sr-only" htmlFor="register-specialty">
+              Specialty
+            </label>
+            <input
+              id="register-specialty"
+              type="text"
+              value={specialty}
+              onChange={(e) => setSpecialty(e.target.value)}
+              placeholder="Specialty (e.g., Cardiologist)"
+            />
+          </>
+        )}
+
         <button type="submit">Register</button>
       </form>
       <button type="button" onClick={onNav} className="secondary-link">

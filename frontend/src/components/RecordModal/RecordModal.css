@@ -58,6 +58,62 @@
   outline-offset: 2px;
   border-color: var(--brand);
 }
+.modal-content input[type='file'] {
+  padding: 8px;
+  font-size: 0.9rem;
+}
+.modal-content input[type='file']::file-selector-button {
+  margin-right: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--brand-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.attachment-hint {
+  margin: -8px 0 12px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.attachment-error {
+  margin: -6px 0 12px;
+  font-size: 0.88rem;
+  color: var(--danger);
+}
+.attachment-current,
+.attachment-selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 0.9rem;
+}
+.attachment-link {
+  color: var(--brand-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.attachment-link:hover {
+  text-decoration: underline;
+}
+.attachment-remove {
+  margin-left: auto;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
 .modal-actions {
   display: flex;
   justify-content: space-between;

@@ -70,7 +70,15 @@ export default function RecordList({ records, onSelect, activeId, onRefresh, isS
                 aria-label={`View access timeline for ${rec.title}`}
               >
                 <span className="record-card-title">{rec.title}</span>
-                <span className="record-card-type">{rec.type}</span>
+                <span className="record-card-type">
+                  {rec.type}
+                  {rec.attachment && (
+                    <span className="record-card-attachment">
+                      {' '}
+                      <span aria-hidden="true">📎</span> Report attached
+                    </span>
+                  )}
+                </span>
               </button>
               <button
                 type="button"
