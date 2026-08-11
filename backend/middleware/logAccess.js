@@ -1,5 +1,8 @@
-import { getDB } from '../config/db.js';
+import { recordAccess } from '../services/accessLog.js';
 
+// Patient self-view demo: after a record is returned, log a simulated access
+// (the accessor identity comes from x-simulated-* headers) attributed to the
+// logged-in patient. Delegates the flag rules to the shared recordAccess helper.
 export default function logAccess(accessType) {
   return async (req, res, next) => {
     const originalJson = res.json;
@@ -9,52 +12,15 @@ export default function logAccess(accessType) {
         try {
           const recordId = req.params.id || (data && data._id ? data._id.toString() : null);
           if (!recordId) return;
-
-          const db = getDB();
-          const logEntry = {
-            userId: req.user._id,
+          await recordAccess({
+            patient: req.user,
             recordId,
             accessorName: req.headers['x-simulated-accessor'] || 'Unknown',
             accessorRole: req.headers['x-simulated-role'] || 'System',
-            timestamp: new Date(),
-            ipAddress: req.ip || '127.0.0.1',
-            device: req.headers['user-agent'] || 'Unknown Device',
+            ipAddress: req.ip,
+            device: req.headers['user-agent'],
             accessType,
-            isFlagged: false,
-            flags: [],
-            aiExplanation: null,
-          };
-
-          const currentHour = logEntry.timestamp.getHours();
-          const offStart = req.user.preferences?.offHoursStart || 23;
-          const offEnd = req.user.preferences?.offHoursEnd || 5;
-          if (currentHour >= offStart || currentHour < offEnd) {
-            logEntry.isFlagged = true;
-            logEntry.flags.push('OFF_HOURS');
-          }
-
-          const tenMinsAgo = new Date(Date.now() - 10 * 60 * 1000);
-          const recentViews = await db.collection('accessLogs').countDocuments({
-            userId: req.user._id,
-            recordId,
-            timestamp: { $gte: tenMinsAgo },
           });
-          if (recentViews >= 3) {
-            logEntry.isFlagged = true;
-            logEntry.flags.push('VIEW_BURST');
-          }
-
-          // New-device check: flag the first time we ever see this device for the user.
-          const seenDevice = await db.collection('accessLogs').countDocuments({
-            userId: req.user._id,
-            device: logEntry.device,
-          });
-          if (seenDevice === 0) {
-            logEntry.isFlagged = true;
-            logEntry.flags.push('NEW_DEVICE');
-          }
-
-          await db.collection('accessLogs').insertOne(logEntry);
         } catch (err) {
           console.error('Logging failed:', err);
         }

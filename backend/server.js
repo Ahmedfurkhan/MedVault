@@ -11,6 +11,7 @@ import recordRoutes from './routes/records.js';
 import logRoutes from './routes/accessLogs.js';
 import dashboardRoutes from './routes/dashboard.js';
 import assistantRoutes from './routes/assistant.js';
+import doctorRoutes from './routes/doctor.js';
 
 dotenv.config();
 const app = express();
@@ -18,7 +19,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const port = Number(process.env.PORT || 5000);
 
-app.use(express.json());
+// Raised limit so base64-encoded record attachments (PDF/JPG/PNG, up to ~5 MB) fit.
+app.use(express.json({ limit: '8mb' }));
 
 // Behind Render's proxy in production, trust X-Forwarded-Proto so `secure: 'auto'`
 // can correctly detect HTTPS.
@@ -52,6 +54,7 @@ app.use(recordRoutes);
 app.use(logRoutes);
 app.use(dashboardRoutes);
 app.use(assistantRoutes);
+app.use(doctorRoutes);
 
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../frontend/dist/index.html')));

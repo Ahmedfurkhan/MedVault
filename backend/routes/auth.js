@@ -10,9 +10,11 @@ const router = Router();
 
 router.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role, specialty } = req.body;
     if (!name || !email || !password)
       return res.status(400).json({ error: 'All fields required.' });
+
+    const userRole = role === 'doctor' ? 'doctor' : 'patient';
 
     const db = getDB();
     const existing = await db.collection('users').findOne({ email: email.toLowerCase() });
@@ -23,11 +25,19 @@ router.post('/api/auth/register', async (req, res) => {
       name,
       email: email.toLowerCase(),
       password: hashedPassword,
+      role: userRole,
       preferences: { offHoursStart: 23, offHoursEnd: 5 },
     };
+    if (userRole === 'doctor') user.specialty = (specialty || 'Physician').slice(0, 80);
     const result = await db.collection('users').insertOne(user);
 
-    const safeUser = { _id: result.insertedId, name, email: user.email };
+    const safeUser = {
+      _id: result.insertedId,
+      name,
+      email: user.email,
+      role: userRole,
+      specialty: user.specialty,
+    };
     req.login(safeUser, (err) =>
       err ? res.status(500).json({ error: 'Login failed' }) : res.status(201).json(safeUser)
     );

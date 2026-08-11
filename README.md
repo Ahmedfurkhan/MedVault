@@ -32,6 +32,18 @@ MedVault is a privacy-first, AI-assisted access auditor for patient medical reco
 
 ![AI access assistant](./screenshots/04-assistant.png)
 
+### Doctor / provider portal
+
+A doctor logs in to browse their patients and open records. **Every record a doctor opens is written to that patient's access audit**, so the patient sees exactly who viewed their data — closing the transparency loop.
+
+|                      Patient list                       |                Record view (access logged)                |
+| :-----------------------------------------------------: | :-------------------------------------------------------: |
+| ![Doctor patient list](./screenshots/10-doctor-portal.png) | ![Doctor record view](./screenshots/11-doctor-patient-records.png) |
+
+The loop closes on the **patient's** side: when the patient signs in, the doctor's view shows up in their own access timeline (here flagged, since it came from a new device):
+
+![Doctor access in the patient's audit timeline](./screenshots/12-patient-doctor-access.png)
+
 ### Login
 
 ![Login](./screenshots/01-login.png)
@@ -114,14 +126,28 @@ docker run --env MONGO_URI=... --env SESSION_SECRET=... --env GROQ_API_KEY=... -
 
 ## Usage
 
-1. Register a new account, or log in with the seeded account `maria@gmail.com` / `password123`.
-2. **My Records** — create, view, edit, and delete medical records. Selecting a record opens its access timeline.
-3. **Dashboard** — review your risk score, off-hours incidents, view-burst counts, the access-trend chart, and AI-explained security alerts.
+There are two roles. The app shows the right portal automatically based on the account you log in with.
+
+### Patient (default)
+
+Log in with the seeded patient `maria@gmail.com` / `password123`, or register a new account (the register form lets you pick **Patient** or **Doctor**).
+
+1. **My Records** — create, view, edit, and delete medical records; attach a report file (PDF/JPG/PNG). Selecting a record opens its access timeline.
+2. **Dashboard** — review your risk score, off-hours incidents, view-burst counts, the access-trend chart, and AI-explained security alerts.
+3. **Assistant** — ask, in plain language, who accessed your records; answers are grounded only in your own history.
 4. **Settings** — update your profile and off-hours window used by the anomaly rules.
+
+### Doctor / provider
+
+**Log in with the seeded doctor account `doctor@medvault.com` / `password123`** (or register and choose **Doctor**). You'll land on the **Provider portal**:
+
+1. Browse or search your **patient list**.
+2. Open a patient to see their **records**, then open a record to view it.
+3. **Every record you open is written to that patient's access audit** — so when the patient signs in, they see exactly who viewed their data (e.g. _"Dr. Marcus Smith (Cardiologist)"_ in their timeline). This closes the transparency loop.
 
 ## Notes
 
-- Default seeded credentials: `maria@gmail.com` / `password123`.
+- Seeded logins (all password `password123`): patient `maria@gmail.com`, doctor `doctor@medvault.com`, plus a few extra patients (`james@gmail.com`, `aisha@gmail.com`, `robert@gmail.com`).
 - Secrets are read from environment variables and are never committed. `backend/.env` is git-ignored; only `backend/.env.example` (placeholders) is tracked.
 - The frontend optionally reads `VITE_API_BASE` for a custom production API origin; leave it unset to use the same origin.
 

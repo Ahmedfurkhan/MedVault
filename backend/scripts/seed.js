@@ -19,9 +19,34 @@ async function seed() {
     name: 'Maria Chen',
     email: 'maria@gmail.com',
     password: pwd,
+    role: 'patient',
     preferences: { offHoursStart: 23, offHoursEnd: 5 },
   };
   await db.collection('users').insertOne(user);
+
+  // A doctor account (sees the doctor portal) and a few extra patients so the
+  // doctor's patient list is populated.
+  const doctor = {
+    _id: new ObjectId(),
+    name: 'Dr. Marcus Smith',
+    email: 'doctor@medvault.com',
+    password: pwd,
+    role: 'doctor',
+    specialty: 'Cardiologist',
+  };
+  const extraPatients = [
+    { name: 'James Wilson', email: 'james@gmail.com' },
+    { name: 'Aisha Khan', email: 'aisha@gmail.com' },
+    { name: 'Robert Garcia', email: 'robert@gmail.com' },
+  ].map((p) => ({
+    _id: new ObjectId(),
+    name: p.name,
+    email: p.email,
+    password: pwd,
+    role: 'patient',
+    preferences: { offHoursStart: 23, offHoursEnd: 5 },
+  }));
+  await db.collection('users').insertMany([doctor, ...extraPatients]);
 
   // Realistic synthetic medical records, grouped by record type. Titles and notes
   // read like a real patient chart instead of "Record #1".
@@ -167,10 +192,47 @@ async function seed() {
     }
   }
 
-  await db.collection('records').insertMany(records);
-  await db.collection('accessLogs').insertMany(logs);
+  // Give each extra patient a small, realistic chart so the doctor has several
+  // patients to browse. A few pre-existing access logs each, but plenty of
+  // records left for the doctor's own views to generate fresh audit entries.
+  const extraRecords = [];
+  const extraLogs = [];
+  for (const patient of extraPatients) {
+    for (let r = 0; r < 24; r++) {
+      const recId = new ObjectId();
+      const type = recordTypes[r % recordTypes.length];
+      const pool = recordTemplates[type];
+      const template = pool[Math.floor(r / recordTypes.length) % pool.length];
+      extraRecords.push({
+        _id: recId,
+        userId: patient._id,
+        title: template.title,
+        type,
+        date: new Date(now - r * 3 * 24 * 3600 * 1000),
+        notes: template.notes,
+      });
+      // One benign historical access per record.
+      const accessor = accessors[(r + 1) % accessors.length];
+      extraLogs.push({
+        userId: patient._id,
+        recordId: recId.toString(),
+        accessorName: accessor.name,
+        accessorRole: accessor.role,
+        timestamp: new Date(now - r * 5 * 3600 * 1000),
+        ipAddress: `192.168.2.${r}`,
+        device: knownDevices[r % knownDevices.length],
+        accessType: 'view',
+        isFlagged: false,
+        flags: [],
+      });
+    }
+  }
+
+  await db.collection('records').insertMany([...records, ...extraRecords]);
+  await db.collection('accessLogs').insertMany([...logs, ...extraLogs]);
   console.log(
-    `Seeded User (maria@gmail.com / password123), ${records.length} records and ${logs.length} logs.`
+    `Seeded: patient maria@gmail.com (${records.length} records), doctor doctor@medvault.com, ` +
+      `and ${extraPatients.length} extra patients (${extraRecords.length} records). All passwords: password123.`
   );
   process.exit(0);
 }
