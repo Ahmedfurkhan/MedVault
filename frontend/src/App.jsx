@@ -10,6 +10,7 @@ import AccessTimeline from './components/AccessTimeline/AccessTimeline';
 import RiskDashboard from './components/RiskDashboard/RiskDashboard';
 import AssistantChat from './components/AssistantChat/AssistantChat';
 import DoctorPortal from './components/DoctorPortal/DoctorPortal';
+import ProfileSettings from './components/ProfileSettings/ProfileSettings';
 import './App.css';
 import API_BASE from './apiBase';
 
@@ -32,12 +33,6 @@ export default function App() {
   const [activeRecord, setActiveRecord] = useState(null);
   const [timelineLogs, setTimelineLogs] = useState([]);
   const [dashboardData, setDashboardData] = useState(null);
-  const [settings, setSettings] = useState({
-    name: '',
-    email: '',
-    offHoursStart: 23,
-    offHoursEnd: 5,
-  });
 
   const resetFlow = useRef(false);
 
@@ -105,17 +100,6 @@ export default function App() {
         .then(setDashboardData);
   }, [user, view]);
 
-  useEffect(() => {
-    if (user) {
-      setSettings({
-        name: user.name || '',
-        email: user.email || '',
-        offHoursStart: 23,
-        offHoursEnd: 5,
-      });
-    }
-  }, [user]);
-
   const fetchTimeline = async (record) => {
     setActiveRecord(record);
     await fetch(`${API_BASE}/api/records/${record._id}`, {
@@ -130,29 +114,6 @@ export default function App() {
     });
     const data = await res.json();
     setTimelineLogs(Array.isArray(data) ? data : []);
-  };
-
-  const [settingsStatus, setSettingsStatus] = useState('');
-
-  const handleSaveSettings = async () => {
-    setSettingsStatus('Saving…');
-    const res = await fetch(`${API_BASE}/api/auth/profile`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: settings.name,
-        offHoursStart: settings.offHoursStart,
-        offHoursEnd: settings.offHoursEnd,
-      }),
-    });
-    if (res.ok) {
-      const updated = await res.json();
-      setUser(updated);
-      setSettingsStatus('Saved!');
-    } else {
-      setSettingsStatus('Save failed. Please try again.');
-    }
   };
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -208,7 +169,10 @@ export default function App() {
             aria-label="Primary"
             className={`app-nav nav-menu ${menuOpen ? 'open' : ''}`}
           >
-            <span className="user-pill">Hi, {user.name}</span>
+            <span className="user-pill">
+              {user.avatar && <img className="user-pill-avatar" src={user.avatar} alt="" />}
+              Hi, {user.name}
+            </span>
             <button
               type="button"
               onClick={() => go('portal')}
@@ -395,89 +359,7 @@ export default function App() {
           </div>
         )}
         {view === 'settings' && user && (
-          <div className="settings-shell">
-            <div className="settings-card">
-              <p className="eyebrow">Profile & Settings</p>
-              <h2>Manage your account preferences</h2>
-              <p className="settings-subtitle">
-                Keep your profile details up to date and tune the off-hours window used by the
-                anomaly rules.
-              </p>
-
-              <form
-                className="settings-grid"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSaveSettings();
-                }}
-              >
-                <label htmlFor="settings-name">
-                  <span>Full name</span>
-                  <input
-                    id="settings-name"
-                    name="name"
-                    autoComplete="name"
-                    value={settings.name}
-                    onChange={(e) => setSettings({ ...settings, name: e.target.value })}
-                  />
-                </label>
-                <label htmlFor="settings-email">
-                  <span>Email</span>
-                  <input
-                    id="settings-email"
-                    name="email"
-                    autoComplete="email"
-                    value={settings.email}
-                    disabled
-                    readOnly
-                  />
-                </label>
-                <label htmlFor="settings-offhours-start">
-                  <span>Off-hours start</span>
-                  <input
-                    id="settings-offhours-start"
-                    type="number"
-                    min="0"
-                    max="23"
-                    aria-describedby="offhours-hint"
-                    value={settings.offHoursStart}
-                    onChange={(e) =>
-                      setSettings({ ...settings, offHoursStart: Number(e.target.value) })
-                    }
-                  />
-                </label>
-                <label htmlFor="settings-offhours-end">
-                  <span>Off-hours end</span>
-                  <input
-                    id="settings-offhours-end"
-                    type="number"
-                    min="0"
-                    max="23"
-                    aria-describedby="offhours-hint"
-                    value={settings.offHoursEnd}
-                    onChange={(e) =>
-                      setSettings({ ...settings, offHoursEnd: Number(e.target.value) })
-                    }
-                  />
-                </label>
-                <p id="offhours-hint" className="settings-hint">
-                  Use a 24-hour clock (0–23). Access during this window is treated as off-hours.
-                </p>
-
-                <div className="settings-actions">
-                  <span className="settings-status" role="status" aria-live="polite">
-                    {settingsStatus}
-                  </span>
-                  <button type="button" className="secondary-btn" onClick={() => setView('portal')}>
-                    Back to records
-                  </button>
-                  <button type="submit" className="primary-btn">
-                    Save changes
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <ProfileSettings user={user} onUpdated={setUser} onBack={() => setView('portal')} />
         )}
         {view === 'doctor' && user && isDoctor && <DoctorPortal />}
       </main>

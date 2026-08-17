@@ -8,6 +8,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 import RiskScoreCard from '../RiskScoreCard/RiskScoreCard';
 import './RiskDashboard.css';
@@ -36,6 +39,20 @@ export default function RiskDashboard({ data, theme = 'light' }) {
   const totalFlags = data.trendData.reduce((sum, d) => sum + (d.flagCount || 0), 0);
   const chartSummary = `Trend of daily record access over ${data.trendData.length} days: ${totalViews} total views and ${totalFlags} flagged anomalies.`;
 
+  // Donut: breakdown of the flagged access by anomaly type.
+  const donutColors =
+    theme === 'dark'
+      ? { offHours: '#fbbf24', viewBurst: '#f87171', newDevice: '#2dd4bf' }
+      : { offHours: '#f59e0b', viewBurst: '#ef4444', newDevice: '#0d9488' };
+  const donut = [
+    { name: 'Off-hours', value: data.offHoursCount, color: donutColors.offHours },
+    { name: 'View bursts', value: data.viewBurstCount, color: donutColors.viewBurst },
+    { name: 'New device', value: data.newDeviceCount, color: donutColors.newDevice },
+  ];
+  const donutTotal = donut.reduce((sum, d) => sum + d.value, 0);
+  const donutData = donut.filter((d) => d.value > 0);
+  const donutSummary = `Anomaly breakdown: ${data.offHoursCount} off-hours, ${data.viewBurstCount} view bursts, and ${data.newDeviceCount} new-device alerts.`;
+
   return (
     <div className="dashboard-layout">
       <h2 className="sr-only">Security and risk dashboard</h2>
@@ -55,41 +72,97 @@ export default function RiskDashboard({ data, theme = 'light' }) {
         </div>
       </div>
 
-      <section className="chart-section" aria-labelledby="trend-heading">
-        <h3 id="trend-heading">ACCESS VOLUME &amp; FLAGS TREND</h3>
-        <p className="sr-only">{chartSummary}</p>
-        <div style={{ width: '100%', height: 250 }} aria-hidden="true">
-          <ResponsiveContainer>
-            <AreaChart data={data.trendData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
-              <XAxis
-                dataKey="_id"
-                tick={{ fontSize: 12, fill: chart.axis }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis tick={{ fontSize: 12, fill: chart.axis }} tickLine={false} axisLine={false} />
-              <Tooltip />
-              <Area
-                type="monotone"
-                dataKey="accessCount"
-                name="Total Views"
-                stroke={chart.views}
-                fill={chart.viewsFill}
-                strokeWidth={2}
-              />
-              <Area
-                type="monotone"
-                dataKey="flagCount"
-                name="Anomalies"
-                stroke={chart.anomaly}
-                fill={chart.anomalyFill}
-                strokeWidth={2}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+      <div className="chart-grid">
+        <section className="chart-section" aria-labelledby="trend-heading">
+          <h3 id="trend-heading">ACCESS VOLUME &amp; FLAGS TREND</h3>
+          <p className="sr-only">{chartSummary}</p>
+          <div style={{ width: '100%', height: 250 }} aria-hidden="true">
+            <ResponsiveContainer>
+              <AreaChart data={data.trendData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
+                <XAxis
+                  dataKey="_id"
+                  tick={{ fontSize: 12, fill: chart.axis }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: chart.axis }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip />
+                <Area
+                  type="monotone"
+                  dataKey="accessCount"
+                  name="Total Views"
+                  stroke={chart.views}
+                  fill={chart.viewsFill}
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="flagCount"
+                  name="Anomalies"
+                  stroke={chart.anomaly}
+                  fill={chart.anomalyFill}
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        <section className="chart-section" aria-labelledby="donut-heading">
+          <h3 id="donut-heading">ANOMALY BREAKDOWN</h3>
+          <p className="sr-only">{donutSummary}</p>
+          {donutTotal === 0 ? (
+            <p className="donut-empty">
+              No anomalies detected — nothing unusual in your access history.
+            </p>
+          ) : (
+            <div className="donut-wrap">
+              <div className="donut-canvas" aria-hidden="true">
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={donutData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={55}
+                      outerRadius={85}
+                      paddingAngle={2}
+                      stroke="none"
+                      rootTabIndex={-1}
+                    >
+                      {donutData.map((d) => (
+                        <Cell key={d.name} fill={d.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="donut-center" aria-hidden="true">
+                  <span className="donut-center-value">{donutTotal}</span>
+                  <span className="donut-center-label">flags</span>
+                </div>
+              </div>
+              <ul className="donut-legend">
+                {donut.map((d) => (
+                  <li key={d.name}>
+                    <span
+                      className="donut-swatch"
+                      style={{ background: d.color }}
+                      aria-hidden="true"
+                    />
+                    {d.name}: <strong>{d.value}</strong>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+      </div>
 
       <section className="alerts-section" aria-labelledby="alerts-heading">
         <h3 id="alerts-heading">SECURITY ALERTS (AI EXPLAINED)</h3>

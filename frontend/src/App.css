@@ -260,6 +260,14 @@ h4 {
   font-weight: 600;
   font-size: 0.9rem;
   white-space: nowrap;
+  gap: 8px;
+}
+.user-pill-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
 }
 .logout-btn {
   color: var(--danger) !important;

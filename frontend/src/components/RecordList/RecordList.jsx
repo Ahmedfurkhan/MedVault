@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import RecordModal from '../RecordModal/RecordModal';
+import API_BASE from '../../apiBase';
 import './RecordList.css';
 
 export default function RecordList({ records, onSelect, activeId, onRefresh, isSearching }) {
   const [modal, setModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [status, setStatus] = useState('');
+  // Which record is showing its inline delete confirmation.
+  const [confirmingId, setConfirmingId] = useState(null);
 
   // Clear the confirmation message a few seconds after it appears.
   useEffect(() => {
@@ -18,6 +21,16 @@ export default function RecordList({ records, onSelect, activeId, onRefresh, isS
   const handleSaved = (message) => {
     onRefresh();
     if (message) setStatus(message);
+  };
+
+  const deleteRecord = async (rec) => {
+    const res = await fetch(`${API_BASE}/api/records/${rec._id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    setConfirmingId(null);
+    if (res.ok) handleSaved('Record deleted.');
+    else setStatus('Could not delete the record. Please try again.');
   };
 
   return (
@@ -80,17 +93,53 @@ export default function RecordList({ records, onSelect, activeId, onRefresh, isS
                   )}
                 </span>
               </button>
-              <button
-                type="button"
-                className="record-card-edit"
-                onClick={() => {
-                  setEditing(rec);
-                  setModal(true);
-                }}
-                aria-label={`Edit ${rec.title}`}
-              >
-                Edit
-              </button>
+              {confirmingId === rec._id ? (
+                <div
+                  className="record-card-confirm"
+                  role="group"
+                  aria-label={`Delete ${rec.title}?`}
+                >
+                  <span className="record-card-confirm-text">Delete this record?</span>
+                  <div className="record-card-actions">
+                    <button
+                      type="button"
+                      className="record-card-edit"
+                      onClick={() => setConfirmingId(null)}
+                    >
+                      Keep
+                    </button>
+                    <button
+                      type="button"
+                      className="record-card-delete"
+                      onClick={() => deleteRecord(rec)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="record-card-actions">
+                  <button
+                    type="button"
+                    className="record-card-edit"
+                    onClick={() => {
+                      setEditing(rec);
+                      setModal(true);
+                    }}
+                    aria-label={`Edit ${rec.title}`}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="record-card-delete"
+                    onClick={() => setConfirmingId(rec._id)}
+                    aria-label={`Delete ${rec.title}`}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>

@@ -8,6 +8,22 @@ import requireAuth from '../middleware/requireAuth.js';
 
 const router = Router();
 
+const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+const MAX_AVATAR_BYTES = 1_000_000; // ~1 MB
+
+// Validate an incoming avatar data URL. Returns { ok, value } or { ok:false, error }.
+function validateAvatar(dataUrl) {
+  const match = /^data:([^;]+);base64,(.+)$/s.exec(dataUrl || '');
+  if (!match) return { ok: false, error: 'Invalid image.' };
+  const mimeType = match[1].toLowerCase();
+  if (!AVATAR_TYPES.includes(mimeType))
+    return { ok: false, error: 'Profile photo must be a PNG, JPG, or WEBP image.' };
+  const size = Math.floor((match[2].length * 3) / 4);
+  if (size > MAX_AVATAR_BYTES)
+    return { ok: false, error: 'Profile photo must be 1 MB or smaller.' };
+  return { ok: true, value: dataUrl };
+}
+
 router.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password, role, specialty } = req.body;
@@ -61,9 +77,18 @@ router.post('/api/auth/login', (req, res, next) => {
 
 router.put('/api/auth/profile', requireAuth, async (req, res) => {
   try {
-    const { name, offHoursStart, offHoursEnd } = req.body;
+    const { name, phone, avatar, removeAvatar, offHoursStart, offHoursEnd } = req.body;
     const update = {};
+    const unset = {};
     if (name) update.name = name;
+    if (phone !== undefined) update.phone = String(phone).slice(0, 40);
+    if (avatar) {
+      const parsed = validateAvatar(avatar);
+      if (!parsed.ok) return res.status(400).json({ error: parsed.error });
+      update.avatar = parsed.value;
+    } else if (removeAvatar) {
+      unset.avatar = '';
+    }
     if (offHoursStart !== undefined && offHoursEnd !== undefined) {
       update.preferences = {
         offHoursStart: Number(offHoursStart),
@@ -72,12 +97,37 @@ router.put('/api/auth/profile', requireAuth, async (req, res) => {
     }
 
     const db = getDB();
-    await db.collection('users').updateOne({ _id: new ObjectId(req.user._id) }, { $set: update });
+    const mutation = { $set: update };
+    if (Object.keys(unset).length) mutation.$unset = unset;
+    await db.collection('users').updateOne({ _id: new ObjectId(req.user._id) }, mutation);
 
     const user = await db.collection('users').findOne({ _id: new ObjectId(req.user._id) });
     const safeUser = { ...user };
     delete safeUser.password;
     res.json(safeUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/api/auth/change-password', requireAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword)
+      return res.status(400).json({ error: 'Both current and new passwords are required.' });
+    if (newPassword.length < 6)
+      return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+
+    const db = getDB();
+    const user = await db.collection('users').findOne({ _id: new ObjectId(req.user._id) });
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) return res.status(400).json({ error: 'Your current password is incorrect.' });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await db.collection('users').updateOne({ _id: user._id }, { $set: { password: hashed } });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -77,15 +77,48 @@
   color: var(--brand-text);
   font-weight: 600;
 }
-.record-card-edit {
+.record-card-actions {
+  display: flex;
+  gap: 8px;
   margin-top: 10px;
-  padding: 7px 10px;
+}
+.record-card-edit {
+  padding: 7px 12px;
   border: none;
   border-radius: 999px;
   cursor: pointer;
   background: var(--brand-soft);
   color: var(--brand-text);
   font-weight: 600;
+}
+.record-card-delete {
+  padding: 7px 12px;
+  border: 1px solid var(--sev-high-bg);
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--sev-high-bg);
+  color: var(--sev-high-fg);
+  font-weight: 600;
+}
+.record-card-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--sev-high-bg);
+}
+.record-card-confirm-text {
+  font-weight: 600;
+  color: var(--sev-high-fg);
+}
+.record-card-confirm .record-card-delete {
+  background: var(--danger-solid);
+  border-color: var(--danger-solid);
+  color: #ffffff;
 }
 .empty-state {
   background: var(--surface-2);
