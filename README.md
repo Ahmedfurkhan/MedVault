@@ -80,7 +80,7 @@ Create `backend/.env` (copy from `backend/.env.example`):
 
 ```
 PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/medvault
+MONGO_URI=create_MongoDB/medvault
 SESSION_SECRET=replace_with_a_strong_secret
 GROQ_API_KEY=your_groq_api_key_here
 ```
